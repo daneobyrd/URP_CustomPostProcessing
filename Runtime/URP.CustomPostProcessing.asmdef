@@ -1,13 +1,10 @@
 {
-    "name": "Kino.Postprocessing.Editor",
+    "name": "URP.CustomPostProcessing",
     "references": [
-        "Kino.Postprocessing",
         "Unity.RenderPipelines.Core.Runtime",
-        "Unity.RenderPipelines.Core.Editor"
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

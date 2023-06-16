@@ -1,13 +1,16 @@
 {
-    "author": "Keijiro Takahashi",
-    "dependencies": { "com.unity.render-pipelines.universal": "7.4.1" },
-    "description": "Custom post processing effect collection for URP",
-    "displayName": "Kino",
+    "author": "Dane Byrd",
+    "dependencies": { "com.unity.render-pipelines.universal": "12.1.12" },
+    "description": "A custom post processing solution for URP using the Volume Framework.",
+    "displayName": "URP Custom Post Processing",
     "keywords": [ "unity" ],
     "license": "Unlicense",
-    "name": "jp.keijiro.kino.post-processing",
-    "repository": "github:keijiro/Kino",
-    "unity": "2019.4",
-    "unityRelease": "0f1",
-    "version": "2.1.15"
+    "name": "db.urp.custom-post-processing",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/daneobyrd/URP_CustomPostProcessing"
+    },
+    "unity": "2021.3.27",
+    "version": "0.2021.01"
 }
