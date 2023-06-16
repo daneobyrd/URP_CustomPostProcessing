@@ -1,16 +1,15 @@
 {
     "author": "Dane Byrd",
-    "dependencies": { "com.unity.render-pipelines.universal": "12.1.12" },
+    "dependencies":
+    {
+        "com.unity.render-pipelines.universal": "12.1.12"
+    },
     "description": "A custom post processing solution for URP using the Volume Framework.",
     "displayName": "URP Custom Post Processing",
     "keywords": [ "unity" ],
     "license": "Unlicense",
     "name": "db.urp.custom-post-processing",
-    "repository":
-    {
-        "type": "git",
-        "url": "https://github.com/daneobyrd/URP_CustomPostProcessing"
-    },
-    "unity": "2021.3.27",
-    "version": "0.2021.01"
+    "repository": "github:daneobyrd/URP_CustomPostProcessing",
+    "unity": "2021.3",
+    "version": "0.2.1"
 }

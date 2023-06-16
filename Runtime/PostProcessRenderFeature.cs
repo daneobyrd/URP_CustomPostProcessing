@@ -30,7 +30,7 @@ namespace URP_CustomPostProcessing
         /// </summary>
         [HideInInspector] public int passIndex = 0;
 
-        public KinoPostProcessData postProcessData;
+        public ScriptableObject postProcessData;
         public PostProcessOrderConfig config;
 
         public PostProcessRenderPass customPass_BeforeTransparents;
@@ -105,7 +105,7 @@ namespace URP_CustomPostProcessing
 
             config.OnDataChange = Create;
 #endif
-            postProcessData ??= KinoPostProcessData.GetDefaultUserPostProcessData();
+            // postProcessData ??= ScriptableObject.GetDefaultUserPostProcessData();
 
             if (config.beforeTransparents.Count > 0)
             {

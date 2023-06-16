@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using static Kino.PostProcessing.CustomPostProcessUtils;
+using static URP_CustomPostProcessing.CustomPostProcessUtils;
 
 namespace URP_CustomPostProcessing
 {
@@ -15,7 +15,7 @@ namespace URP_CustomPostProcessing
         private readonly string _displayName;
 
         // private MaterialLibrary m_Materials;
-        private KinoPostProcessData m_Data;
+        private ScriptableObject m_Data;
         private RenderTargetIdentifier m_Source      { get; set; }
         private RenderTargetHandle     m_Destination { get; set; }
         private RenderTargetHandle m_Depth;
@@ -40,7 +40,7 @@ namespace URP_CustomPostProcessing
 
         private bool DestinationIsCameraTarget() { return m_Destination == RenderTargetHandle.CameraTarget; }
 
-        public PostProcessRenderPass(InjectionPoint injectionPoint, KinoPostProcessData data, PostProcessOrderConfig config, Material blitMaterial)
+        public PostProcessRenderPass(InjectionPoint injectionPoint, ScriptableObject data, PostProcessOrderConfig config, Material blitMaterial)
         {
             _displayName    = $"Custom {injectionPoint} Pass";
             renderPassEvent = (RenderPassEvent) injectionPoint;
@@ -315,10 +315,10 @@ namespace URP_CustomPostProcessing
 
                 using (new ProfilingScope(cmd, new ProfilingSampler(currentEffect.displayName)))
                 {
-                    if (currentEffect is Streak streak)
-                    {
-                        streak.SetCameraData(cameraData);
-                    }
+                    // if (currentEffect is Streak streak)
+                    // {
+                    //     streak.SetCameraData(cameraData);
+                    // }
 
                     // destination is front buffer or tempRT
                     cmd.SetRenderTarget(GetDestination());
@@ -448,10 +448,10 @@ namespace URP_CustomPostProcessing
             for (int i = 0; i < _activeVolumeList.Count; i++)
             {
                 var volumeComp = _activeVolumeList[i];
-                if (volumeComp is Streak streak)
-                {
-                    streak.SetCameraData(cameraData);
-                }
+                // if (volumeComp is Streak streak)
+                // {
+                //     streak.SetCameraData(cameraData);
+                // }
 
                 if (i == 0)
                 {
@@ -512,6 +512,7 @@ namespace URP_CustomPostProcessing
             public static readonly int _FullscreenProjMat = Shader.PropertyToID("_FullscreenProjMat");
         }
 
+        /*
         public class MaterialLibrary
         {
             // Associate all of your custom effects with Materials
@@ -592,6 +593,7 @@ namespace URP_CustomPostProcessing
                 CoreUtils.Destroy(testCard);
             }
         }
+        */
 
         #endregion
     }
