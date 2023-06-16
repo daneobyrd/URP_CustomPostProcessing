@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
-using static Kino.PostProcessing.KinoCore;
 
-namespace Kino.PostProcessing
+namespace URP_CustomPostProcessing
 {
     using UnityEngine;
-    using static KinoCore;
     using System;
     using System.Collections.Generic;
 
@@ -40,7 +38,7 @@ namespace Kino.PostProcessing
 }
 
 #if UNITY_EDITOR
-namespace Kino.PostProcessing
+namespace URP_CustomPostProcessing
 {
     using UnityEditor;
     using UnityEditorInternal;

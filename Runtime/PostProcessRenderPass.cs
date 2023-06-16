@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using static Kino.PostProcessing.CustomPostProcessUtils;
 
-namespace Kino.PostProcessing
+namespace URP_CustomPostProcessing
 {
     public class PostProcessRenderPass : ScriptableRenderPass
     {

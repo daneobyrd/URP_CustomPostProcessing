@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace Kino.PostProcessing
+namespace URP_CustomPostProcessing
 {
     /// <summary>
     /// CustomPassRendererFeature is a renderer feature used to change screen appearance such as post processing effect.

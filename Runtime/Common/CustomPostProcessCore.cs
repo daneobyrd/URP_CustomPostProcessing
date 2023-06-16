@@ -2,23 +2,88 @@
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using static Kino.PostProcessing.KinoCore;
 
-namespace Kino.PostProcessing
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace URP_CustomPostProcessing
 {
-    public static class KinoCore
+    public static class CustomPostProcessCore
     {
-        public static readonly string packagePath = "Packages/jp.keijiro.kino.post-processing";
+        public static readonly string packagePath = "Packages/db.urp.custom-post-processing";
+    }
 
+    public static class CustomPostProcessingMenuItems
+    {
+#if UNITY_EDITOR
+        [MenuItem("Assets/Create/Rendering/Custom Post Processing/Empty URP Post-process Data")]
+        public static void CreateExamplePostProcessDataClass()
+        {
+            string templatePath = $"{CustomPostProcessCore.packagePath}/Editor/01-C# Script-ScriptableObject_NewPostProcessData.txt";
+
+            const string destinationPath = "Assets/Scripts/Rendering/Data";
+            string scriptName = "EmptyPostProcessData.cs";
+            var fullPath = destinationPath + "/" + scriptName;
+
+            // Replace fullPath with just the scriptName and delete the Creating folders section
+            // if you simply want the file to be created in your currently active folder.
+
+            #region Create Folders if Needed
+
+            // There HAS to be a better way to create a script in a path, and create that directory if it does not exist.
+            string segment0 = "Assets";
+            string segment1 = "Scripts";
+            string segment2 = "Rendering";
+            string segment3 = "Data";
+
+            string[] segments = {segment0, segment1, segment2, segment3};
+
+            var baseDir = $"{segment0}";
+            var subDir1 = $"{segment0}/{segment1}";
+            var subDir2 = $"{segment0}/{segment1}/{segment2}";
+            var subDir3 = $"{segment0}/{segment1}/{segment2}/{segment3}";
+
+            string[] pathHierarchy = {baseDir, subDir1, subDir2, subDir3};
+
+            // If path doesn't exist, create the necessary subFolders
+            for (var i = 1; i < pathHierarchy.Length; i++)
+            {
+                var parentFolder = pathHierarchy[i - 1];
+                var newSubFolder = pathHierarchy[i];
+
+                var existingSubFolders = AssetDatabase.GetSubFolders(parentFolder);
+                if (existingSubFolders.Contains(newSubFolder)) continue;
+
+                AssetDatabase.CreateFolder(parentFolder, segments[i]);
+                AssetDatabase.Refresh();
+            }
+
+            #endregion
+
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(templatePath, fullPath);
+
+            AssetDatabase.Refresh();
+        }
+#endif
+    }
+
+    public static class RenderTargetHandleExtension
+    {
+        public static void Release(this RenderTargetHandle renderTargetHandle, CommandBuffer cmd) { cmd.ReleaseTemporaryRT(renderTargetHandle.id); }
+    }
+
+    public static class ScriptableRendererInternal
+    {
         // Adapted from ScriptableRendererData
         /// <summary>
         /// Returns true if contains renderer feature with specified type.
         /// </summary>
         /// <typeparam name="T">Renderer Feature type.</typeparam>
         /// <returns></returns>
-        public static bool TryGetRendererFeature<T>(in ScriptableRendererData rendererData, out T rendererFeature) where T : ScriptableRendererFeature
+        private static bool TryGetRendererFeature<T>(in ScriptableRendererData rendererData, out T rendererFeature) where T : ScriptableRendererFeature
         {
             foreach (var target in rendererData.rendererFeatures)
             {
@@ -55,39 +120,6 @@ namespace Kino.PostProcessing
                 throw new NullReferenceException(nameof(rendererData));
         }
 
-
-        /// <summary>
-        /// Meant to be used as a simpler way to determine which blit URP is using and if there is RTHandle support.
-        /// </summary>
-        public static void SetBlitterKeyword(CommandBuffer cmd)
-        {
-            bool useSRPBlitter = false;
-#if UNITY_2022_1_OR_NEWER
-            // UNITY_CORE_BLIT_INCLUDED and RTHandle support
-            useSRPBlitter = true;
-            // #else
-            // UNIVERSAL_FULLSCREEN_INCLUDED
-#endif
-            CoreUtils.SetKeyword(cmd, "USE_BLITTER_API", useSRPBlitter);
-        }
-
-        public enum KinoProfileId
-        {
-            Streak,  // BeforePostProcess
-            Overlay, // AfterPostProcess ↓
-            Recolor,
-            Glitch,
-            Sharpen,
-            Utility, // Multipurpose: HueShift, Invert, Fade
-            Slice,
-            TestCard
-        }
-    }
-
-    #region Accessing Internal Methods and QoL Extensions
-
-    static class ScriptableRendererInternal
-    {
         private static void GetUniversalRendererMethodInternal(ScriptableRenderer renderer, string methodName, out MethodInfo rendererMethod)
         {
             UniversalRenderer universalRenderer = renderer as UniversalRenderer;
@@ -99,6 +131,8 @@ namespace Kino.PostProcessing
 #endif
             }
         }
+
+        #region SwapBuffer
 
         public static void EnableSwapBufferMSAA(this ScriptableRenderer renderer, bool enable)
         {
@@ -150,16 +184,19 @@ namespace Kino.PostProcessing
             if (methodInfo == null || bufferObject == null)
             {
 #if UNITY_EDITOR
-                #if !UNITY_2022_1_OR_NEWER // 2021
+#if !UNITY_2022_1_OR_NEWER // 2021
                 {
                     // GetBackBuffer method was added in 2022
                     if (methodName != "GetBackBuffer")
                     {
-                        Debug.LogError($"Unable to access m_ColorBufferSystem.{methodName}() via System.Reflection." +
-                                         "Check the provided method name and/or whether the method exists.");
+                        Debug.LogError
+                        (
+                            $"Unable to access m_ColorBufferSystem.{methodName}() via System.Reflection." +
+                            "Check the provided method name and/or whether the method exists."
+                        );
                     }
                 }
-                #endif
+#endif
 #endif
                 return fallbackCameraTarget;
             }
@@ -169,10 +206,7 @@ namespace Kino.PostProcessing
             return colorBufferHandle.id;
         }
 
-        public static RenderTargetIdentifier GetCameraColorBackBuffer(this ScriptableRenderer renderer, CommandBuffer cmd)
-        {
-            return GetCameraColorBufferInternal(renderer, cmd, "GetBackBuffer");
-        }
+        public static RenderTargetIdentifier GetCameraColorBackBuffer(this ScriptableRenderer renderer, CommandBuffer cmd) { return GetCameraColorBufferInternal(renderer, cmd, "GetBackBuffer"); }
 
         public static RenderTargetIdentifier GetCameraColorFrontBuffer(this ScriptableRenderer renderer, CommandBuffer cmd)
         {
@@ -180,30 +214,8 @@ namespace Kino.PostProcessing
             return (RenderTargetIdentifier) rendererMethod.Invoke(renderer, new object[] {cmd});
             // return GetCameraColorBufferInternal(renderer, cmd, "GetFrontBuffer");
         }
-    }
 
-    static class CustomPostProcessPassExtension
-    {
-        public static void DrawFullscreen(ref CommandBuffer commandBuffer, RenderTargetIdentifier colorBuffer, Material material, int shaderPassId = 0)
-        {
-            commandBuffer.SetRenderTarget(colorBuffer);
-            // commandBuffer.DrawProcedural(Matrix4x4.identity, material, shaderPassId, MeshTopology.Triangles, 3, 1);
-            commandBuffer.DrawMesh(RenderingUtils.fullscreenMesh, Matrix4x4.identity, material, 0, shaderPassId);
-        }
-
-        public static void FinalBlit(this PostProcessRenderPass pass,
-                                     CommandBuffer cmd, RenderTargetIdentifier source, ref RenderingData renderingData, Material _material, int passIndex = 0)
-        {
-            cmd.SetPostProcessInputTexture(source);
-            pass.ConfigureTarget(source);
-            pass.ConfigureClear(ClearFlag.All, Color.white);
-            pass.Blit(cmd, ref renderingData, _material, passIndex);
-        }
-    }
-
-    public static class RenderTargetHandleExtension
-    {
-        public static void Release(this RenderTargetHandle renderTargetHandle, CommandBuffer cmd) { cmd.ReleaseTemporaryRT(renderTargetHandle.id); }
+        #endregion
     }
 
     public static class CameraDataInternal
@@ -215,6 +227,4 @@ namespace Kino.PostProcessing
             return (bool) getRequireSrgbConversionBool.GetValue(cameraData);
         }
     }
-
-    #endregion
 }

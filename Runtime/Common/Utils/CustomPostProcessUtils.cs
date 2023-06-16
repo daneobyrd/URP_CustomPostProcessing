@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace Kino.PostProcessing
+namespace URP_CustomPostProcessing
 {
     public static class CustomPostProcessUtils
     {

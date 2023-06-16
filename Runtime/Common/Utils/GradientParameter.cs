@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Kino.PostProcessing
+namespace URP_CustomPostProcessing
 {
     [System.Serializable]
     public sealed class GradientParameter : VolumeParameter<Gradient>

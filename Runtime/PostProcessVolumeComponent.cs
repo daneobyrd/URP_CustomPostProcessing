@@ -3,18 +3,16 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using SerializableAttribute = System.SerializableAttribute;
 
-namespace Kino.PostProcessing
+namespace URP_CustomPostProcessing
 {
     /// <summary>
     /// An injection point for the full screen pass. This is similar to RenderPassEvent enum but limits to only supported events.
     /// </summary>
     public enum InjectionPoint
     {
-        AfterSkybox = RenderPassEvent.AfterRenderingSkybox,
         BeforeTransparents = RenderPassEvent.BeforeRenderingTransparents,
         BeforePostProcess = RenderPassEvent.BeforeRenderingPostProcessing,
         AfterPostProcess = RenderPassEvent.AfterRenderingPostProcessing,
-        AfterRendering = RenderPassEvent.AfterRendering
     }
 
     public abstract class PostProcessVolumeComponent : VolumeComponent, IPostProcessComponent
@@ -47,10 +45,10 @@ namespace Kino.PostProcessing
         /// </summary>
         public virtual void Setup() { }
 
-        // Set m_Material directly
+        // Set material directly
         public virtual void Setup(Material initMaterial) { this.material = initMaterial; }
 
-        // Set m_Material using resources or reference to shaders stored in ScriptableObject.
+        // Set material using resources or reference to shaders stored in ScriptableObject.
         // Example: Unity's PostProcessData
         public virtual void Setup(ScriptableObject scriptableObject) { }
         
