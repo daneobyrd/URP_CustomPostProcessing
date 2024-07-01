@@ -1,0 +1,29 @@
+// Copyright 2021 by Hextant Studios. https://HextantStudios.com
+// This work is licensed under CC BY 4.0. http://creativecommons.org/licenses/by/4.0/
+
+using System;
+
+// Specifies the settings type, path in the settings UI, and optionally its
+// filename. If the filename is not set, the type's name is used.
+// Note: The displayPath can use a path separator '/' to create a Settings instance
+// that is grouped or nested under another. ex: "Services/My Project Settings"
+public sealed class SettingsAttribute : Attribute
+{
+    public SettingsAttribute(SettingsUsage usage, string displayPath = null, string fileName = null)
+    {
+        Usage = usage;
+        FileName     = fileName;
+        
+        var displayPathPrefix = usage == SettingsUsage.EditorUser ? "Preferences/" : "Project/";
+        DisplayPath = displayPath != null ? displayPathPrefix + displayPath : null;
+    }
+
+    // The type of settings (how and when they are used).
+    public readonly SettingsUsage Usage;
+
+    // The display name and optional path in the settings dialog.
+    public readonly string DisplayPath;
+
+    // The filename used to store the settings. If null, the type's name is used.
+    public readonly string FileName;
+}
