@@ -5,8 +5,11 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace URP_CustomPostProcessing
+namespace CustomPostProcessing.UniversalRP
 {
+    using InjectionPoint = CustomPostProcessing.UniversalRP.CustomPostProcessInjectionPoint;
+    using PostProcessVolumeComponent = CustomPostProcessing.UniversalRP.CustomPostProcessVolumeComponent;
+
     public static class CustomPostProcessUtils
     {
         #region GetVolumeCollections
@@ -28,7 +31,7 @@ namespace URP_CustomPostProcessing
                 var component = stack.GetComponent(volumeType) as PostProcessVolumeComponent;
                 if (!component) continue;
 
-                switch (component.InjectionPoint)
+                switch (component.injectionPoint)
                 {
                     case InjectionPoint.BeforeTransparents:
                         effectsBeforeTransparents.Add(component);
@@ -63,7 +66,7 @@ namespace URP_CustomPostProcessing
                 allPostProcessVolumeComponents.Add(component);
 
                 // Populates Dictionary with derived types and corresponding injectionPoint.
-                volumeTypeInjectionPointDictionary.TryAdd(volumeType, component.InjectionPoint);
+                volumeTypeInjectionPointDictionary.TryAdd(volumeType, component.injectionPoint);
             }
 
             customVolumeTypes.RemoveAll(t => t == null);
@@ -182,11 +185,8 @@ namespace URP_CustomPostProcessing
 
         private static readonly int PostBufferID = Shader.PropertyToID("_InputTexture");
         private static readonly int scaleBiasID = Shader.PropertyToID("_ScaleBias");
-        
-        public static void SetPostProcessInputTexture(this CommandBuffer cmd, RenderTargetIdentifier identifier)
-        {
-            cmd.SetGlobalTexture(PostBufferID, identifier);
-        }
+
+        public static void SetPostProcessInputTexture(this CommandBuffer cmd, RenderTargetIdentifier identifier) { cmd.SetGlobalTexture(PostBufferID, identifier); }
 
         public static void SetPostProcessRenderTarget(this ScriptableRenderer renderer,
                                                       CommandBuffer cmd,
@@ -201,18 +201,24 @@ namespace URP_CustomPostProcessing
         {
             // XRTODO: Revisit the logic. Why treat CameraTarget depth specially?
             if (depthAttachment == BuiltinRenderTextureType.CameraTarget)
-                CoreUtils.SetRenderTarget(cmd, colorAttachment, colorLoadAction, colorStoreAction,
-                                          colorAttachment, depthLoadAction, depthStoreAction, clearFlags, clearColor);
+                CoreUtils.SetRenderTarget
+                (
+                    cmd, colorAttachment, colorLoadAction, colorStoreAction,
+                    colorAttachment, depthLoadAction, depthStoreAction, clearFlags, clearColor
+                );
             else
-                CoreUtils.SetRenderTarget(cmd, colorAttachment, colorLoadAction, colorStoreAction,
-                                          depthAttachment, depthLoadAction, depthStoreAction, clearFlags, clearColor);
+                CoreUtils.SetRenderTarget
+                (
+                    cmd, colorAttachment, colorLoadAction, colorStoreAction,
+                    depthAttachment, depthLoadAction, depthStoreAction, clearFlags, clearColor
+                );
         }
 
         #region Fullscreen Mesh
 
         static Mesh s_TriangleMesh;
         static Mesh s_QuadMesh;
-        
+
         // Should match Common.hlsl
         static Vector3[] GetFullScreenTriangleVertexPosition(float z /*= UNITY_NEAR_CLIP_VALUE*/)
         {
@@ -222,6 +228,7 @@ namespace URP_CustomPostProcessing
                 Vector2 uv = new Vector2((i << 1) & 2, i & 2);
                 r[i] = new Vector3(uv.x * 2.0f - 1.0f, uv.y * 2.0f - 1.0f, z);
             }
+
             return r;
         }
 
@@ -236,6 +243,7 @@ namespace URP_CustomPostProcessing
                 else
                     r[i] = new Vector2((i << 1) & 2, i & 2);
             }
+
             return r;
         }
 
@@ -251,6 +259,7 @@ namespace URP_CustomPostProcessing
                 float y = 1 - (topBit + botBit) & 1; // produces 1 for indices 0,3 and 0 for 1,2
                 r[i] = new Vector3(x, y, z);
             }
+
             return r;
         }
 
@@ -269,11 +278,12 @@ namespace URP_CustomPostProcessing
 
                 r[i] = new Vector2(u, v);
             }
+
             return r;
         }
 
         #endregion
-        
+
         public static void DrawFullScreenTriangle(this CommandBuffer cmd, Material material, RenderTargetIdentifier destination, int shaderPass = 0)
         {
             // CoreUtils.SetRenderTarget(cmd, destination);
@@ -283,7 +293,7 @@ namespace URP_CustomPostProcessing
                 RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store, RenderBufferLoadAction.Load, RenderBufferStoreAction.Store
             );
             // cmd.DrawProcedural(Matrix4x4.identity, material, shaderPass, MeshTopology.Triangles, 3, 1, null);
-            
+
             if (SystemInfo.graphicsShaderLevel < 30)
                 cmd.DrawMesh(s_TriangleMesh, Matrix4x4.identity, material, 0, shaderPass, null);
             else

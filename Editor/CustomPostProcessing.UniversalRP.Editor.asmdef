@@ -1,6 +1,6 @@
 {
     "name": "CustomPostProcessing.UniversalRP.Editor",
-    "rootNamespace": "CustomPostProcessing.UniversalRP",
+    "rootNamespace": "",
     "references": [
         "GUID:90bf50708992f714290241d2e72ee036",
         "GUID:3eae0364be2026648bf74846acb8a731",

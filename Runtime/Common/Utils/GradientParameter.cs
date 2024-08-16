@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace URP_CustomPostProcessing
+namespace CustomPostProcessing.UniversalRP
 {
     [System.Serializable]
     public sealed class GradientParameter : VolumeParameter<Gradient>

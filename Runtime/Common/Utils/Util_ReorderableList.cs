@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using static UnityEditorInternal.ReorderableList;
 
-namespace URP_CustomPostProcessing
+namespace CustomPostProcessing.UniversalRP
 {
     public static class Util_ReorderableList
     {

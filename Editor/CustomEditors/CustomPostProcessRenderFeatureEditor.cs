@@ -22,7 +22,7 @@ namespace CustomPostProcessing.UniversalRP.Editor
         internal ReorderableList ReadOnlyBeforeTransparents;
         internal ReorderableList ReadOnlyBeforePostProcess;
         internal ReorderableList ReadOnlyAfterPostProcess;
-        
+
         private void OnEnable()
         {
             // serializedObject.FindProperty("CustomBeforeTransparentsPass");
@@ -71,7 +71,7 @@ namespace CustomPostProcessing.UniversalRP.Editor
                         EditorGUILayout.Space();
                         EditorGUILayout.ObjectField(m_ResourceData, typeof(ScriptableObject), Content.PostProcessData);
                     }
-                    
+
                     ActivePostProcessDrawer.Draw(serialized, this);
                 }
             }

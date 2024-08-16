@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
+using InjectionPoint = CustomPostProcessing.UniversalRP.CustomPostProcessInjectionPoint;
 
-namespace URP_CustomPostProcessing
+namespace CustomPostProcessing.UniversalRP
 {
     using UnityEngine;
     using System;
@@ -38,7 +38,7 @@ namespace URP_CustomPostProcessing
 }
 
 #if UNITY_EDITOR
-namespace URP_CustomPostProcessing
+namespace CustomPostProcessing.UniversalRP
 {
     using UnityEditor;
     using UnityEditorInternal;
@@ -98,12 +98,12 @@ namespace URP_CustomPostProcessing
 
                 foreach (var item in VolumeManager.instance.baseComponentTypeArray)
                 {
-                    var comp = VolumeManager.instance.stack.GetComponent(item) as PostProcessVolumeComponent;
+                    var comp = VolumeManager.instance.stack.GetComponent(item) as CustomPostProcessVolumeComponent;
 
                     if (comp == null)
                         continue;
 
-                    if (comp.InjectionPoint != injectionPoint)
+                    if (comp.injectionPoint != injectionPoint)
                         continue;
 
                     menu.AddItem(new GUIContent(comp.GetType().ToString()), false, tryAddVolumeComp(comp, injectionPoint));
@@ -116,7 +116,7 @@ namespace URP_CustomPostProcessing
             {
                 return () =>
                 {
-                    var data = userData as PostProcessVolumeComponent;
+                    var data = userData as CustomPostProcessVolumeComponent;
                     var typeName = data.GetType().ToString();
                     var list = instance.GetVolumeList(customInjectionPoint);
                     if (list.Contains(typeName) == false)
